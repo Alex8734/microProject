@@ -2,7 +2,7 @@ using Mx;
 using Mx.Shared;
 using Mx.Util;
 using Microsoft.AspNetCore.Mvc;
-using NodaTime.Serialization.SystemTextJson;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +12,7 @@ var settings = builder.Services.LoadAndConfigureSettings(configurationManager);
 
 builder.AddLogging();
 builder.Services.AddApplicationServices(configurationManager, isDev);
-builder.Services.AddOpenApi();
+builder.Services.AddOApi();
 builder.Services.AddCors(settings);
 builder.Services.AddControllers(o => { o.ModelBinderProviders.Insert(0, new NodaTimeModelBinderProvider()); })
        .AddJsonOptions(o => ConfigureJsonSerialization(o, isDev));
@@ -25,10 +25,9 @@ var app = builder.Build();
 app.UseCors(Setup.CorsPolicyName);
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
+
+
 
 await app.RunAsync();
 

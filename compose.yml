@@ -39,7 +39,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=app_db
+      - POSTGRES_DB=MxDb
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
