@@ -1,0 +1,33 @@
+# Main site configuration
+{
+    # Global options
+    admin off
+    # Use the internal Docker DNS for service discovery
+    servers {
+        protocol {
+            experimental_http3
+        }
+    }
+}
+
+# Handle requests to the domain (or localhost in development)
+:80 {
+    # Enable compression
+    encode gzip
+
+    # Handle API requests - route to backend
+    handle_path /api/* {
+        reverse_proxy backend:5000
+    }
+
+    # Handle all other requests - route to frontend
+    handle {
+        reverse_proxy frontend:4200
+    }
+
+    # Log all requests
+    log {
+        output file /var/log/caddy/access.log
+        format console
+    }
+}
