@@ -1,0 +1,104 @@
+@baseUrl = http://localhost:5200
+@contentType = application/json
+
+### Track Management ###
+
+# Create a new track
+POST {{baseUrl}}/api/track?name=Red Bull Ring&lengthInKm=4.318&difficulty=2
+Content-Type: {{contentType}}
+
+### Create another track
+POST {{baseUrl}}/api/track?name=Salzburgring&lengthInKm=4.225&difficulty=3
+Content-Type: {{contentType}}
+
+### Get all tracks
+GET {{baseUrl}}/api/track
+Content-Type: {{contentType}}
+
+### Get track by ID (replace {id} with actual track ID)
+GET {{baseUrl}}/api/track/1
+Content-Type: {{contentType}}
+
+### Delete track (replace {id} with actual track ID)
+DELETE {{baseUrl}}/api/track/1
+Content-Type: {{contentType}}
+
+### Motorcycle Management ###
+
+# Create a new motorcycle
+POST {{baseUrl}}/api/motorcycle?model=KTM RC 390&number=M001&horsepower=43&trackId=1
+Content-Type: {{contentType}}
+
+### Create another motorcycle
+POST {{baseUrl}}/api/motorcycle?model=Yamaha R3&number=M002&horsepower=42&trackId=1
+Content-Type: {{contentType}}
+
+### Get all motorcycles
+GET {{baseUrl}}/api/motorcycle
+Content-Type: {{contentType}}
+
+### Get available motorcycles
+GET {{baseUrl}}/api/motorcycle/available
+Content-Type: {{contentType}}
+
+### Get motorcycle by ID (replace {id} with actual motorcycle ID)
+GET {{baseUrl}}/api/motorcycle/1
+Content-Type: {{contentType}}
+
+### Delete motorcycle (replace {id} with actual motorcycle ID)
+DELETE {{baseUrl}}/api/motorcycle/1
+Content-Type: {{contentType}}
+
+### User Management ###
+
+# Create a new user
+POST {{baseUrl}}/api/user?name=Max Mustermann&age=25&weight=75.5
+Content-Type: {{contentType}}
+
+### Create another user
+POST {{baseUrl}}/api/user?name=Anna Schmidt&age=30&weight=65.0
+Content-Type: {{contentType}}
+
+### Get all users
+GET {{baseUrl}}/api/user
+Content-Type: {{contentType}}
+
+### Get user by ID (replace {id} with actual user ID)
+GET {{baseUrl}}/api/user/1
+Content-Type: {{contentType}}
+
+### Delete user (replace {id} with actual user ID)
+DELETE {{baseUrl}}/api/user/1
+Content-Type: {{contentType}}
+
+### Rental Operations ###
+
+# Rent a motorcycle (replace {motorcycleId} and {userId} with actual IDs)
+POST {{baseUrl}}/api/motorcycle/1/rent?userId=1
+Content-Type: {{contentType}}
+
+### Return a motorcycle (replace {motorcycleId} with actual ID)
+POST {{baseUrl}}/api/motorcycle/1/return
+Content-Type: {{contentType}}
+
+### Test Validation Scenarios ###
+
+# Try to create track with invalid length
+POST {{baseUrl}}/api/track?name=Invalid Track&lengthInKm=100&difficulty=1
+Content-Type: {{contentType}}
+
+### Try to create motorcycle with invalid horsepower
+POST {{baseUrl}}/api/motorcycle?model=Invalid Bike&number=M999&horsepower=1000&trackId=1
+Content-Type: {{contentType}}
+
+### Try to create user with invalid age
+POST {{baseUrl}}/api/user?name=Invalid User&age=15&weight=70.0
+Content-Type: {{contentType}}
+
+### Try to rent already rented motorcycle
+POST {{baseUrl}}/api/motorcycle/1/rent?userId=2
+Content-Type: {{contentType}}
+
+### Try to return non-rented motorcycle
+POST {{baseUrl}}/api/motorcycle/2/return
+Content-Type: {{contentType}} 
