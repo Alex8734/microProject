@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mx.Persistence\Mx.Persistence.csproj"/>
+        <InternalsVisibleTo Include="Mx.Test"/>
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OneOf" Version="3.0.271"/>
+    </ItemGroup>
+
+</Project>
