@@ -1,25 +1,26 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-
-# Copy csproj and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
-
-# Copy everything else and build
-COPY . .
-RUN dotnet publish -c Release -o /app
-
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+USER $APP_UID
 WORKDIR /app
-COPY --from=build /app .
+EXPOSE 8080
+EXPOSE 8081
 
-# Set environment variables
-ENV ASPNETCORE_URLS=http://+:5000
-ENV ASPNETCORE_ENVIRONMENT=Production
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["Mx/Mx.csproj", "Mx/"]
+COPY ["Mx.Core/Mx.Core.csproj", "Mx.Core/"]
+COPY ["Mx.Persistence/Mx.Persistence.csproj", "Mx.Persistence/"]
+COPY ["Mx.Shared/Mx.Shared.csproj", "Mx.Shared/"]
+RUN dotnet restore "Mx/Mx.csproj"
+COPY . .
+WORKDIR "/src/Mx"
+RUN dotnet build "./Mx.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Expose port
-EXPOSE 5000
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Mx.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-ENTRYPOINT ["dotnet", "backend.dll"]
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Mx.dll"]

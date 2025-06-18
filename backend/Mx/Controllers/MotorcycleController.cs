@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Mx.Core.Services;
 using Mx.Persistence.Model;
+using Mx.Dtos;
 
 namespace Mx.Controllers;
 
@@ -16,37 +17,37 @@ public class MotorcycleController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Motorcycle>> CreateMotorcycle(string model, string number, int horsepower, int? trackId)
+    public async Task<ActionResult<MotorcycleDto>> CreateMotorcycle(string model, string number, int horsepower, int? trackId)
     {
         var result = await _motorcycleService.AddMotorcycleAsync(model, number, horsepower, trackId);
-        return result.Match<ActionResult<Motorcycle>>(
-            motorcycle => Ok(motorcycle),
+        return result.Match<ActionResult<MotorcycleDto>>(
+            motorcycle => Ok(MotorcycleDto.FromMotorcycle(motorcycle)),
             error => BadRequest(error.Message)
         );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Motorcycle>> GetMotorcycle(int id)
+    public async Task<ActionResult<MotorcycleDto>> GetMotorcycle(int id)
     {
         var result = await _motorcycleService.GetMotorcycleByIdAsync(id, false);
-        return result.Match<ActionResult<Motorcycle>>(
-            motorcycle => Ok(motorcycle),
+        return result.Match<ActionResult<MotorcycleDto>>(
+            motorcycle => Ok(MotorcycleDto.FromMotorcycle(motorcycle)),
             _ => NotFound()
         );
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<Motorcycle>>> GetAllMotorcycles()
+    public async Task<ActionResult<IReadOnlyCollection<MotorcycleDto>>> GetAllMotorcycles()
     {
         var motorcycles = await _motorcycleService.GetAllMotorcyclesAsync();
-        return Ok(motorcycles);
+        return Ok(motorcycles.Select(MotorcycleDto.FromMotorcycle).ToList());
     }
 
     [HttpGet("available")]
-    public async Task<ActionResult<IReadOnlyCollection<Motorcycle>>> GetAvailableMotorcycles()
+    public async Task<ActionResult<IReadOnlyCollection<MotorcycleDto>>> GetAvailableMotorcycles()
     {
         var motorcycles = await _motorcycleService.GetAvailableMotorcyclesAsync();
-        return Ok(motorcycles);
+        return Ok(motorcycles.Select(MotorcycleDto.FromMotorcycle).ToList());
     }
 
     [HttpDelete("{id}")]
@@ -78,4 +79,4 @@ public class MotorcycleController : ControllerBase
             error => BadRequest(error.Message)
         );
     }
-} 
+}

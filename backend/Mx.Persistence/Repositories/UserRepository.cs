@@ -47,7 +47,7 @@ public sealed class UserRepository(DbSet<User> userSet) : IUserRepository
 
         var user = await source
             .Include(u => u.RentedMotorcycle)
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Ssn == id);
 
         return user;
     }

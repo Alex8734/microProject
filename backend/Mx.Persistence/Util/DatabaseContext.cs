@@ -60,8 +60,8 @@ public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) :
     private static void ConfigureUser(ModelBuilder modelBuilder)
     {
         EntityTypeBuilder<User> user = modelBuilder.Entity<User>();
-        user.HasKey(u => u.Id);
-        user.Property(u => u.Id).ValueGeneratedOnAdd();
+        user.HasKey(u => u.Ssn);
+        user.Property(u => u.Ssn).ValueGeneratedOnAdd();
         user.Property(u => u.Name).IsRequired();
         user.Property(u => u.Age).IsRequired();
         user.Property(u => u.Weight).HasPrecision(10, 2).IsRequired();

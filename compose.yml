@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  # Docker daemon service that exposes the Docker API
+
+  docker-client-check:
+    image: docker:cli
+    container_name: docker-client
+    volumes:
+      - //./pipe/docker_engine:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    command: ["docker", "version"]
+    networks:
+      - app-network
+
   # Frontend Angular service
   frontend:
     build:
@@ -22,9 +35,18 @@ services:
     container_name: backend
     restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      simulator:
+        condition: service_started
+      docker-client-check:
+        condition: service_completed_successfully
+    volumes:
+      - ./appsettings.json:/app/appsettings.json
+      - //./pipe/docker_engine:/var/run/docker.sock # For Docker integration
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
     environment:
-      - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;Database=app_db;User Id=postgres;Password=postgres;
       - ASPNETCORE_ENVIRONMENT=Production
     ports:
       - "5000:5000"
@@ -65,6 +87,16 @@ services:
     networks:
       - app-network
 
+  # Simulator service
+  simulator:
+    build:
+      context: ./simulator
+      dockerfile: Dockerfile
+    container_name: simulator
+    restart: unless-stopped
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
@@ -73,3 +105,4 @@ volumes:
   postgres-data:
   caddy-data:
   caddy-config:
+  docker-data:
