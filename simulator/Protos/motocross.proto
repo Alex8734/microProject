@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "SimService";
+
+package motocross;
+
+service MotocrossSimulation {
+  rpc StreamSimulationData (SimulationRequest) returns (stream SimulationData);
+}
+
+message SimulationRequest {
+  string track_path = 1;
+  string bike_model_path = 2;
+  float initial_speed = 3;
+  Vector3 initial_position = 4;
+}
+
+message SimulationData {
+  Vector3 position = 1;
+  Vector3 rotation = 2;
+  Vector3 velocity = 3;
+  float speed = 4;
+  float timestamp = 5;
+}
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+} 
