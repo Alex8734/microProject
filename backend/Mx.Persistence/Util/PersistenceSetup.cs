@@ -36,6 +36,7 @@ public static class PersistenceSetup
     {
         optionsBuilder.UseNpgsql(connectionString,
                                  options => options
+                                            .MigrationsAssembly("Mx.Persistence")
                                             .UseNodaTime()
                                             .MigrationsHistoryTable(MigrationHistoryTable,
                                                                     DatabaseContext.SchemaName))

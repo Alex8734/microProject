@@ -23,7 +23,7 @@ public sealed class DatabaseContext(DbContextOptions<DatabaseContext> options) :
         ConfigureMotorcycle(modelBuilder);
         ConfigureUser(modelBuilder);
     }
-
+    
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);

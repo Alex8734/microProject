@@ -1,0 +1,32 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY ["Mx/Mx.csproj", "Mx/"]
+COPY ["Mx.Core/Mx.Core.csproj", "Mx.Core/"]
+COPY ["Mx.Persistence/Mx.Persistence.csproj", "Mx.Persistence/"]
+COPY ["Mx.Shared/Mx.Shared.csproj", "Mx.Shared/"]
+RUN dotnet restore "Mx/Mx.csproj"
+COPY . .
+WORKDIR "/src/Mx"
+RUN dotnet build "./Mx.csproj" -c Release -o /app/build
+
+# Installiere dotnet-ef Tool für Migrationen
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Erzeuge eine neue Migration mit Zeitstempel und update die Datenbank
+# Wenn keine Migration existiert, erstelle eine initiale Migration mit Seed-Daten
+CMD export MIGRATION_NAME="AutoMig_$(date +%Y%m%d%H%M%S)" && \
+    if [ ! -d "/src/Mx.Persistence/Migrations" ] || [ -z "$(ls -A /src/Mx.Persistence/Migrations)" ]; then \
+        echo "Erstelle initiale Migration mit Seed-Daten..." && \
+        dotnet ef migrations add Initial -p ../Mx.Persistence -s . && \
+        # Stelle sicher, dass die Migration die SeedData-Methode aufruft
+        if ! grep -q "migrationBuilder.SeedData" /src/Mx.Persistence/Migrations/*_Initial.cs; then \
+            sed -i '/migrationBuilder.CreateIndex(/,/);/ s/);/);\\n\\n            migrationBuilder.SeedData();/' $(find /src/Mx.Persistence/Migrations -name "*_Initial.cs") && \
+            echo "SeedData-Aufruf zur Migration hinzugefügt"; \
+        fi; \
+    else \
+        echo "Erstelle inkrementelle Migration..." && \
+        dotnet ef migrations add $MIGRATION_NAME -p ../Mx.Persistence -s . || true; \
+    fi && \
+    echo "Wende Migrationen an..." && \
+    dotnet ef database update -p ../Mx.Persistence -s .

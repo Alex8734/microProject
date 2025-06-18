@@ -38,6 +38,8 @@ services:
         condition: service_started
     networks:
       - app-network
+    volumes:
+      - ./appsettings.json:/app/appsettings.json
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
 
@@ -108,6 +110,15 @@ services:
     build:
       context: ./simulator
       dockerfile: Dockerfile
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Production
+        - TRACK_ID=1
+        - BACKEND_URL=http://backend:5000
+        - GRPC_SERVER_URL=grpc://backend:5000
+        - TRACKER_ID=1
+        - USER_SSN="123-45-6789"
+        - MOTORCYCLE_ID=1
+        - UPDATE_INTERVAL_MS=100
     container_name: simulator
     restart: unless-stopped
     networks:
