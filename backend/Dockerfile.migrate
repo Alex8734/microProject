@@ -6,8 +6,9 @@ COPY ["Mx.Persistence/Mx.Persistence.csproj", "Mx.Persistence/"]
 COPY ["Mx.Shared/Mx.Shared.csproj", "Mx.Shared/"]
 RUN dotnet restore "Mx/Mx.csproj"
 COPY . .
-WORKDIR "/src/Mx"
-RUN dotnet build "./Mx.csproj" -c Release -o /app/build
+WORKDIR "/src/Mx.Persistence"
+RUN dotnet build "../Mx.Persistence/Mx.Persistence.csproj" -c Release -o /app/persistence-build
+RUN dotnet build "../Mx/Mx.csproj" -c Release -o /app/build
 
 # Installiere dotnet-ef Tool für Migrationen
 RUN dotnet tool install --global dotnet-ef
@@ -18,7 +19,9 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 CMD export MIGRATION_NAME="AutoMig_$(date +%Y%m%d%H%M%S)" && \
     if [ ! -d "/src/Mx.Persistence/Migrations" ] || [ -z "$(ls -A /src/Mx.Persistence/Migrations)" ]; then \
         echo "Erstelle initiale Migration mit Seed-Daten..." && \
-        dotnet ef migrations add Initial -p ../Mx.Persistence -s . && \
+        dotnet ef migrations add Initial \
+            --project /src/Mx.Persistence/Mx.Persistence.csproj \
+            --startup-project /src/Mx/Mx.csproj && \
         # Stelle sicher, dass die Migration die SeedData-Methode aufruft
         if ! grep -q "migrationBuilder.SeedData" /src/Mx.Persistence/Migrations/*_Initial.cs; then \
             sed -i '/migrationBuilder.CreateIndex(/,/);/ s/);/);\\n\\n            migrationBuilder.SeedData();/' $(find /src/Mx.Persistence/Migrations -name "*_Initial.cs") && \
@@ -26,7 +29,11 @@ CMD export MIGRATION_NAME="AutoMig_$(date +%Y%m%d%H%M%S)" && \
         fi; \
     else \
         echo "Erstelle inkrementelle Migration..." && \
-        dotnet ef migrations add $MIGRATION_NAME -p ../Mx.Persistence -s . || true; \
+        dotnet ef migrations add $MIGRATION_NAME --no-build \
+            --project /src/Mx.Persistence/Mx.Persistence.csproj \
+            --startup-project /src/Mx/Mx.csproj || true; \
     fi && \
     echo "Wende Migrationen an..." && \
-    dotnet ef database update -p ../Mx.Persistence -s .
+    dotnet ef database update --no-build \
+        --project /src/Mx.Persistence/Mx.Persistence.csproj \
+        --startup-project /src/Mx/Mx.csproj
