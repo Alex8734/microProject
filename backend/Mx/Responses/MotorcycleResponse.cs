@@ -1,8 +1,8 @@
 using Mx.Persistence.Model;
 
-namespace Mx.Dtos;
+namespace Mx.Responses;
 
-public class MotorcycleDto
+public class MotorcycleResponse
 {
     public int Id { get; set; }
     public string Model { get; set; } = default!;
@@ -11,7 +11,7 @@ public class MotorcycleDto
     public int? TrackId { get; set; }
     public bool IsRented { get; set; }
 
-    public static MotorcycleDto FromMotorcycle(Motorcycle m) => new MotorcycleDto
+    public static MotorcycleResponse FromMotorcycle(Motorcycle m) => new MotorcycleResponse
     {
         Id = m.Id,
         Model = m.Model,

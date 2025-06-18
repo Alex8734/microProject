@@ -16,11 +16,19 @@ COPY . .
 WORKDIR "/src/Mx"
 RUN dotnet build "./Mx.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+# Migration Schritt: Migrationen bauen und anwenden
+FROM build AS migrate
+WORKDIR /src/Mx
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+RUN dotnet ef database update --no-build
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Mx.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
+COPY --from=migrate /src/Mx/. .
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Mx.dll"]

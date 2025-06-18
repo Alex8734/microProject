@@ -27,6 +27,20 @@ services:
       - app-network
     # We'll use Caddy to serve the frontend
 
+  # Migration Service für Backend
+  backend-migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.migrate
+    container_name: backend-migrate
+    depends_on:
+      postgres:
+        condition: service_started
+    networks:
+      - app-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+
   # Backend ASP.NET Core API service
   backend:
     build:
@@ -37,10 +51,12 @@ services:
     depends_on:
       postgres:
         condition: service_started
-      simulator:
-        condition: service_started
+      backend-migrate:
+        condition: service_completed_successfully
       docker-client-check:
         condition: service_completed_successfully
+      simulator:
+        condition: service_started
     volumes:
       - ./appsettings.json:/app/appsettings.json
       - //./pipe/docker_engine:/var/run/docker.sock # For Docker integration

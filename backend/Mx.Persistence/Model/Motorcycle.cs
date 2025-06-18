@@ -10,7 +10,7 @@ public class Motorcycle
     public DateTime? LastMaintenanceDate { get; set; }
     public int? TrackId { get; set; }
     public Track? Track { get; set; }
-    public int? RentedById { get; set; }
+    public string? RentedBySsn { get; set; }
     public User? RentedBy { get; set; }
     public DateTime? RentalStartTime { get; set; }
 } 

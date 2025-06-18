@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Mx.Core.Services;
 using Mx.Persistence.Model;
-using Mx.Dtos;
+using Mx.Requests;
+using Mx.Responses;
 
 namespace Mx.Controllers;
 
@@ -17,36 +18,36 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<UserDto>> CreateUser(string name, int age, double weight)
+    public async Task<ActionResult<UserResponse>> CreateUser([FromBody] UserRequest request)
     {
-        var result = await _userService.AddUserAsync(name, age, weight);
-        return result.Match<ActionResult<UserDto>>(
-            user => Ok(UserDto.FromUser(user)),
+        var result = await _userService.AddUserAsync(request.Ssn, request.Name, request.Age, request.Weight);
+        return result.Match<ActionResult<UserResponse>>(
+            user => Ok(UserResponse.FromUser(user)),
             error => BadRequest(error.Message)
         );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserDto>> GetUser(int id)
+    public async Task<ActionResult<UserResponse>> GetUser(string ssn)
     {
-        var result = await _userService.GetUserByIdAsync(id, false);
-        return result.Match<ActionResult<UserDto>>(
-            user => Ok(UserDto.FromUser(user)),
+        var result = await _userService.GetUserBySsnAsync(ssn, false);
+        return result.Match<ActionResult<UserResponse>>(
+            user => Ok(UserResponse.FromUser(user)),
             _ => NotFound()
         );
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<UserDto>>> GetAllUsers()
+    public async Task<ActionResult<IReadOnlyCollection<UserResponse>>> GetAllUsers()
     {
         var users = await _userService.GetAllUsersAsync();
-        return Ok(users.Select(UserDto.FromUser).ToList());
+        return Ok(users.Select(UserResponse.FromUser).ToList());
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteUser(int id)
+    public async Task<ActionResult> DeleteUser(string ssn)
     {
-        var result = await _userService.DeleteUserAsync(id);
+        var result = await _userService.DeleteUserAsync(ssn);
         return result.Match<ActionResult>(
             _ => NoContent(),
             _ => NotFound()

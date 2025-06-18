@@ -2,7 +2,7 @@ namespace Mx.Persistence.Model;
 
 public class User
 {
-    public int Ssn { get; set; }
+    public required string Ssn { get; set; }
     public required string Name { get; set; }
     public int Age { get; set; }
     public double Weight { get; set; }

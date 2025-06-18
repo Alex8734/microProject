@@ -8,10 +8,10 @@ namespace Mx.Core.Services;
 
 public interface IUserService
 {
-    public ValueTask<OneOf<User, ValidationError>> AddUserAsync(string name, int age, double weight);
-    public ValueTask<OneOf<User, NotFound>> GetUserByIdAsync(int id, bool tracking);
+    public ValueTask<OneOf<User, ValidationError>> AddUserAsync(string ssn, string name, int age, double weight);
+    public ValueTask<OneOf<User, NotFound>> GetUserBySsnAsync(string ssn, bool tracking);
     public ValueTask<IReadOnlyCollection<User>> GetAllUsersAsync();
-    public ValueTask<OneOf<Success, NotFound>> DeleteUserAsync(int id);
+    public ValueTask<OneOf<Success, NotFound>> DeleteUserAsync(string id);
 }
 
 public sealed class UserService(IUnitOfWork uow) : IUserService
@@ -21,7 +21,7 @@ public sealed class UserService(IUnitOfWork uow) : IUserService
     private const double MinWeight = 40.0;
     private const double MaxWeight = 150.0;
 
-    public async ValueTask<OneOf<User, ValidationError>> AddUserAsync(string name, int age, double weight)
+    public async ValueTask<OneOf<User, ValidationError>> AddUserAsync(string ssn, string name, int age, double weight)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -38,14 +38,14 @@ public sealed class UserService(IUnitOfWork uow) : IUserService
             return new ValidationError { Message = $"Weight must be between {MinWeight} and {MaxWeight} kg" };
         }
 
-        var user = uow.UserRepository.AddUser(name, age, weight);
+        var user = uow.UserRepository.AddUser(ssn,name, age, weight);
         await uow.SaveChangesAsync();
         return user;
     }
 
-    public async ValueTask<OneOf<User, NotFound>> GetUserByIdAsync(int id, bool tracking)
+    public async ValueTask<OneOf<User, NotFound>> GetUserBySsnAsync(string id, bool tracking)
     {
-        var user = await uow.UserRepository.GetUserByIdAsync(id, tracking);
+        var user = await uow.UserRepository.GetUserBySsnAsync(id, tracking);
         return user is null ? new NotFound() : user;
     }
 
@@ -55,9 +55,9 @@ public sealed class UserService(IUnitOfWork uow) : IUserService
         return users;
     }
 
-    public async ValueTask<OneOf<Success, NotFound>> DeleteUserAsync(int id)
+    public async ValueTask<OneOf<Success, NotFound>> DeleteUserAsync(string ssn)
     {
-        var user = await uow.UserRepository.GetUserByIdAsync(id, true);
+        var user = await uow.UserRepository.GetUserBySsnAsync(ssn, true);
 
         if (user is null)
         {

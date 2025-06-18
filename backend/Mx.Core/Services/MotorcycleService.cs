@@ -13,7 +13,7 @@ public interface IMotorcycleService
     public ValueTask<IReadOnlyCollection<Motorcycle>> GetAllMotorcyclesAsync();
     public ValueTask<IReadOnlyCollection<Motorcycle>> GetAvailableMotorcyclesAsync();
     public ValueTask<OneOf<Success, NotFound>> DeleteMotorcycleAsync(int id);
-    public ValueTask<OneOf<Success, ValidationError>> RentMotorcycleAsync(int motorcycleId, int userId);
+    public ValueTask<OneOf<Success, ValidationError>> RentMotorcycleAsync(int motorcycleId,string userSsn);
     public ValueTask<OneOf<Success, ValidationError>> ReturnMotorcycleAsync(int motorcycleId);
 }
 
@@ -90,7 +90,7 @@ public sealed class MotorcycleService(IUnitOfWork uow) : IMotorcycleService
         return new Success();
     }
 
-    public async ValueTask<OneOf<Success, ValidationError>> RentMotorcycleAsync(int motorcycleId, int userId)
+    public async ValueTask<OneOf<Success, ValidationError>> RentMotorcycleAsync(int motorcycleId, string userSsn)
     {
         var motorcycle = await uow.MotorcycleRepository.GetMotorcycleByIdAsync(motorcycleId, true);
         if (motorcycle is null)
@@ -98,7 +98,7 @@ public sealed class MotorcycleService(IUnitOfWork uow) : IMotorcycleService
             return new ValidationError { Message = "Motorcycle not found" };
         }
 
-        var user = await uow.UserRepository.GetUserByIdAsync(userId, true);
+        var user = await uow.UserRepository.GetUserBySsnAsync(userSsn, true);
         if (user is null)
         {
             return new ValidationError { Message = "User not found" };
@@ -115,7 +115,7 @@ public sealed class MotorcycleService(IUnitOfWork uow) : IMotorcycleService
         }
 
         motorcycle.IsRented = true;
-        motorcycle.RentedById = userId;
+        motorcycle.RentedBySsn = userSsn;
         motorcycle.RentalStartTime = DateTime.UtcNow;
         user.RentedMotorcycleId = motorcycleId;
 
@@ -136,14 +136,14 @@ public sealed class MotorcycleService(IUnitOfWork uow) : IMotorcycleService
             return new ValidationError { Message = "Motorcycle is not rented" };
         }
 
-        var user = await uow.UserRepository.GetUserByIdAsync(motorcycle.RentedById!.Value, true);
+        var user = await uow.UserRepository.GetUserBySsnAsync(motorcycle.RentedBySsn!, true);
         if (user is not null)
         {
             user.RentedMotorcycleId = null;
         }
 
         motorcycle.IsRented = false;
-        motorcycle.RentedById = null;
+        motorcycle.RentedBySsn = null;
         motorcycle.RentalStartTime = null;
 
         await uow.SaveChangesAsync();

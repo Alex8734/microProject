@@ -5,9 +5,9 @@ namespace Mx.Persistence.Repositories;
 
 public interface IUserRepository
 {
-    public User AddUser(string name, int age, double weight);
+    public User AddUser(string ssn, string name, int age, double weight);
     public ValueTask<IReadOnlyCollection<User>> GetAllUsersAsync(bool tracking);
-    public ValueTask<User?> GetUserByIdAsync(int id, bool tracking);
+    public ValueTask<User?> GetUserBySsnAsync(string ssn, bool tracking);
     public void RemoveUser(User user);
 }
 
@@ -16,10 +16,11 @@ public sealed class UserRepository(DbSet<User> userSet) : IUserRepository
     private IQueryable<User> Users => userSet;
     private IQueryable<User> UsersNoTracking => Users.AsNoTracking();
 
-    public User AddUser(string name, int age, double weight)
+    public User AddUser(string ssn,string name, int age, double weight)
     {
         var user = new User
         {
+            Ssn = ssn,
             Name = name,
             Age = age,
             Weight = weight
@@ -41,7 +42,7 @@ public sealed class UserRepository(DbSet<User> userSet) : IUserRepository
         return users;
     }
 
-    public async ValueTask<User?> GetUserByIdAsync(int id, bool tracking)
+    public async ValueTask<User?> GetUserBySsnAsync(string id, bool tracking)
     {
         IQueryable<User> source = tracking ? Users : UsersNoTracking;
 

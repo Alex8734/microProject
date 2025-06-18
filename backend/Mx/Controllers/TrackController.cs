@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Mx.Core.Services;
 using Mx.Persistence.Model;
-using Mx.Dtos;
+using Mx.Requests;
+using Mx.Responses;
 
 namespace Mx.Controllers;
 
@@ -17,30 +18,30 @@ public class TrackController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TrackDto>> CreateTrack(string name, double lengthInKm, TrackDifficulty difficulty)
+    public async Task<ActionResult<TrackResponse>> CreateTrack([FromBody] TrackRequest request)
     {
-        var result = await _trackService.AddTrackAsync(name, lengthInKm, difficulty);
-        return result.Match<ActionResult<TrackDto>>(
-            track => Ok(TrackDto.FromTrack(track)),
+        var result = await _trackService.AddTrackAsync(request.Name, request.LengthInKm, request.Difficulty);
+        return result.Match<ActionResult<TrackResponse>>(
+            track => Ok(TrackResponse.FromTrack(track)),
             error => BadRequest(error.Message)
         );
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<TrackDto>> GetTrack(int id)
+    public async Task<ActionResult<TrackResponse>> GetTrack(int id)
     {
         var result = await _trackService.GetTrackByIdAsync(id, false);
-        return result.Match<ActionResult<TrackDto>>(
-            track => Ok(TrackDto.FromTrack(track)),
+        return result.Match<ActionResult<TrackResponse>>(
+            track => Ok(TrackResponse.FromTrack(track)),
             _ => NotFound()
         );
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<TrackDto>>> GetAllTracks()
+    public async Task<ActionResult<IReadOnlyCollection<TrackResponse>>> GetAllTracks()
     {
         var tracks = await _trackService.GetAllTracksAsync();
-        return Ok(tracks.Select(TrackDto.FromTrack).ToList());
+        return Ok(tracks.Select(TrackResponse.FromTrack).ToList());
     }
 
     [HttpDelete("{id}")]

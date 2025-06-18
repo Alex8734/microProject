@@ -1,7 +1,9 @@
 using Mx.Core;
 using Mx.Core.Util;
+using Mx.Hubs;
 using Mx.Persistence;
 using Mx.Persistence.Util;
+using Mx.RPCServices;
 using Mx.Util;
 using Serilog;
 
@@ -17,6 +19,12 @@ public static class Setup
     {
         services.ConfigurePersistence(configurationManager, isDev);
         services.ConfigureCore();
+        
+        // SignalR Hubs hinzufügen
+        services.AddSignalR();
+        
+        // gRPC Services hinzufügen
+        services.AddGrpc();
     }
 
     public static Settings LoadAndConfigureSettings(this IServiceCollection services, IConfigurationManager configurationManager)
@@ -68,5 +76,14 @@ public static class Setup
         {
             options.ConstraintMap.Add(nameof(LocalDate), typeof(LocalDateRouteConstraint));
         });
+    }
+    
+    public static void ConfigureEndpoints(this WebApplication app)
+    {
+        // SignalR Hub-Endpunkte konfigurieren
+        app.MapHub<TrackerHub>("/hubs/tracker");
+        
+        // gRPC Services konfigurieren
+        app.MapGrpcService<TrackerService>();
     }
 }

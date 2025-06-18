@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "Mx.Protos";
+
+package tracker;
+
+// Service für das Senden von Trackerdaten
+service TrackerService {
+  // Sendet neue Koordinaten für einen Tracker
+  rpc SendPosition (PositionRequest) returns (PositionResponse);
+}
+
+// Anfrage zum Senden einer neuen Position
+message PositionRequest {
+  int32 track_id = 1;
+  string tracker_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string user_ssn = 5;
+  int32 motorcycle_id = 6;
+  string timestamp = 7; // ISO 8601 Format
+}
+
+// Antwort auf eine gesendete Position
+message PositionResponse {
+  bool success = 1;
+  string message = 2;
+}
