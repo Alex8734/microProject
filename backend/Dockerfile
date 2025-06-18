@@ -31,4 +31,9 @@ FROM base AS final
 WORKDIR /app
 COPY --from=migrate /src/Mx/. .
 COPY --from=publish /app/publish .
+
+# Docker CLI installieren
+USER root
+RUN apt-get update && apt-get install -y docker.io && rm -rf /var/lib/apt/lists/*
+
 ENTRYPOINT ["dotnet", "Mx.dll"]

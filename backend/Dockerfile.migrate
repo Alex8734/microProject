@@ -7,7 +7,6 @@ COPY ["Mx.Shared/Mx.Shared.csproj", "Mx.Shared/"]
 RUN dotnet restore "Mx/Mx.csproj"
 COPY . .
 WORKDIR "/src/Mx.Persistence"
-RUN dotnet build "../Mx.Persistence/Mx.Persistence.csproj" -c Release -o /app/persistence-build
 RUN dotnet build "../Mx/Mx.csproj" -c Release -o /app/build
 
 # Installiere dotnet-ef Tool für Migrationen
