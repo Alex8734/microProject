@@ -1,0 +1,27 @@
+<form (ngSubmit)="onSubmit()" class="user-form">
+  <mat-form-field appearance="fill">
+    <mat-label>SSN</mat-label>
+    <input matInput id="ssn" name="ssn" type="text" [(ngModel)]="user.ssn" required />
+  </mat-form-field>
+<br>
+  <mat-form-field appearance="fill">
+    <mat-label>Name</mat-label>
+    <input matInput id="name" name="name" type="text" [(ngModel)]="user.name" required />
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+    <mat-label>Alter</mat-label>
+    <input matInput id="age" name="age" type="number" [(ngModel)]="user.age" required />
+  </mat-form-field>
+  <br>
+  <mat-form-field appearance="fill">
+    <mat-label>Gewicht</mat-label>
+    <input matInput id="weight" name="weight" type="number" [(ngModel)]="user.weight" required />
+  </mat-form-field>
+  <br>
+  @if (errorMessage != null) {
+    <mat-error>{{errorMessage}}</mat-error>
+  }
+
+  <button mat-raised-button color="primary" type="submit">Absenden</button>
+</form>

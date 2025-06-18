@@ -1,4 +1,76 @@
-/* You can add global styles to this file, and also import other style files */
+bro /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; } // MX Motocross Style
+$mx-orange: #ff6600;
+$mx-black: #181818;
+$mx-white: #fff;
+$mx-gray: #f5f5f5;
+$mx-dark-gray: #333;
+$mx-green: #4caf50;
+$mx-red: #e53935;
+$mx-shadow: 0 4px 16px rgba(24,24,24,0.08);
+$mx-radius: 12px;
+$mx-font: 'Oswald', 'Roboto', Arial, sans-serif;
+
+body {
+  background: $mx-gray;
+  font-family: $mx-font;
+  color: $mx-black;
+  margin: 0;
+}
+
+.mat-toolbar {
+  background: linear-gradient(90deg, $mx-orange 60%, $mx-black 100%);
+  color: $mx-white;
+  font-family: $mx-font;
+  font-size: 1.3rem;
+  box-shadow: $mx-shadow;
+  min-height: 64px;
+}
+
+.mat-toolbar .spacer {
+  flex: 1 1 auto;
+}
+
+button.mat-button, button.mat-raised-button {
+  font-family: $mx-font;
+  font-weight: 600;
+  border-radius: $mx-radius;
+  margin-left: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+button.mat-button:hover, button.mat-raised-button:hover {
+  background: $mx-black;
+  color: $mx-orange;
+}
+
+.mat-elevation-z8 {
+  box-shadow: $mx-shadow;
+  border-radius: $mx-radius;
+  background: $mx-white;
+}
+
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.mat-form-field-appearance-fill .mat-form-field-flex {
+  background: $mx-gray;
+  border-radius: $mx-radius;
+}
+
+.mat-error {
+  color: $mx-red;
+  font-weight: 600;
+}
+
+h1, h2, h3 {
+  font-family: $mx-font;
+  color: $mx-orange;
+  margin-top: 0;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap');
