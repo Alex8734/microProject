@@ -13,6 +13,7 @@ RUN dotnet build "../Mx/Mx.csproj" -c Release -o /app/build
 RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
+
 # Erzeuge eine neue Migration mit Zeitstempel und update die Datenbank
 # Wenn keine Migration existiert, erstelle eine initiale Migration mit Seed-Daten
 CMD export MIGRATION_NAME="AutoMig_$(date +%Y%m%d%H%M%S)" && \
